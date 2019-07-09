@@ -1,7 +1,7 @@
 <?php
 
 //1 #### Mysql database settings
-    $server   = "localhost";
+    $server   = "127.0.0.1";
     $database = "emoncms";
     $username = "emoncms";
     $password = "emonpiemoncmsmysql2016";
@@ -26,7 +26,8 @@
                           'port'     => 1883,
                           'user'     => 'emonpi',
                           'password' => 'emonpimqtt2016',
-                          'basetopic'=> 'emon'
+                          'basetopic'=> 'emon',
+                          'client_id' => 'emoncms'
                           );
 
 
@@ -105,7 +106,7 @@
     $enable_password_reset = false;
 
     // Email address to email proccessed input values
-    $default_emailto = 'emrys@localhost';
+    $default_emailto = 'root@localhost';
 
     // (OPTIONAL) Email SMTP, used for password reset or other email functions
     $smtp_email_settings = array(
@@ -141,7 +142,7 @@
 //6 #### Other settings
     // Log file configuration
     $log_enabled = true;
-    $log_filename = '/var/log/emoncms.log';
+    $log_location = "/var/log/emoncms";
     // Log Level: 1=INFO, 2=WARN, 3=ERROR
     $log_level = 2;
 

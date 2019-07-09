@@ -1,6 +1,7 @@
 <?php
+include_once dirname(__FILE__) . '/shared_helper.php';
 
-class MysqlTimeSeries
+class MysqlTimeSeries implements engine_methods
 {
     protected $mysqli;
     protected $log;
@@ -142,15 +143,11 @@ class MysqlTimeSeries
     }
 
     /**
-     * Return the data for the given timerange
+     * Return the data for the given timerange - cf shared_helper.php
      *
-     * @param integer $feedid The id of the feed to fetch from
-     * @param integer $start The unix timestamp in ms of the start of the data range
-     * @param integer $end The unix timestamp in ms of the end of the data range
-     * @param integer $interval The number os seconds for each data point to return (used by some engines)
-     * @param integer $skipmissing Skip null values from returned data (used by some engines)
-     * @param integer $limitinterval Limit datapoints returned to this value (used by some engines)
-    */
+     * @param integer $limitinterval not implemented
+     *
+     */
     public function get_data($feedid,$start,$end,$interval,$skipmissing,$limitinterval)
     {
         global $data_sampling;
@@ -698,6 +695,36 @@ class MysqlTimeSeries
         exit;
     }
 
+
+    public function clear($feedid){
+        $feedid = filter_var ( $feedid, FILTER_SANITIZE_NUMBER_INT);
+        $table = "feed_$feedid";
+        $sql = "TRUNCATE TABLE $table";
+        if(!$this->mysqli->query($sql)) {
+            return array('success'=>false,'message'=>"0 rows deleted");
+        } else {
+            return array('success'=>true,'message'=>"All database rows deleted");
+        }
+    }
+    
+    public function trim($feedid, $start_time){
+        $feedid = filter_var ( $feedid, FILTER_SANITIZE_NUMBER_INT);
+        $start_time = filter_var ( $start_time, FILTER_SANITIZE_NUMBER_INT);
+        $table = "feed_$feedid";
+        $stmt = $this->mysqli->prepare("DELETE FROM $table WHERE time < ?");
+        if(!$stmt) return array('success'=>false,'message'=>"Error accessing database");
+        if(!$stmt->bind_param("i", $start_time)) return array('success'=>false,'message'=>"Error passing parameters to database");
+        if(!$stmt->execute()) return array('success'=>false,'message'=>"Error executing commands on database");
+        $affected_rows = $stmt->affected_rows;
+        if($affected_rows>0){
+            return array('success'=>true,'message'=>"$affected_rows rows deleted");
+        } else {
+            return array('success'=>false,'message'=>"0 rows deleted");
+        }
+    }
+
+
+
 // #### /\ Above are required methods
 
 
@@ -780,5 +807,5 @@ class MysqlTimeSeries
        }
        return false;
     }
-
+    
 }

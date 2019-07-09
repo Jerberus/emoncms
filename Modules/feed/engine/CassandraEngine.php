@@ -1,4 +1,6 @@
 <?php
+// engine_methods interface in shared_helper.php
+include_once dirname(__FILE__) . '/shared_helper.php';
 
 /**
  * CassandraEngine
@@ -6,7 +8,7 @@
  * @SuppressWarnings(PHPMD.TooManyMethods)
  *
  */
-class CassandraEngine
+class CassandraEngine implements engine_methods
 {
     const ONE_TABLE_PER_FEED = false;
     protected $cluster;
@@ -159,16 +161,9 @@ class CassandraEngine
     }
 
     /**
-     * Return the data for the given timerange
+     * Return the data for the given timerange - cf shared_helper.php
      *
-     * @param integer $feedid The id of the feed to fetch from
-     * @param integer $start The unix timestamp in ms of the start of the data range
-     * @param integer $end The unix timestamp in ms of the end of the data range
-     * @param integer $interval The number os seconds for each data point to return (used by some engines)
-     * @param integer $skipmissing Skip null values from returned data (used by some engines)
-     * @param integer $limitinterval Limit datapoints returned to this value (used by some engines)
-     *
-     * {@inheritdoc}
+     * @param integer $limitinterval not implemented
      *
      */
     public function get_data($feedid,$start,$end,$interval,$skipmissing,$limitinterval)
@@ -222,6 +217,13 @@ class CassandraEngine
     		
         $this->log->info("csv_export($feedid,$start,$end,$outinterval)");  // add: $usertimezone
         // TODO implement
+    }
+
+    public function trim($feedid,$start_time){
+        return array('success'=>false,'message'=>'"Trim" not available for this storage engine');
+    }
+    public function clear($feedid){
+        return array('success'=>false,'message'=>'"Clear" not available for this storage engine');
     }
 
 // #### /\ Above are required methods
